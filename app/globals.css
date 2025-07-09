@@ -1,0 +1,426 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Space Grotesk is not self-hosted in this preview – using system fonts */
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 43 38% 95%;
+    --foreground: 164 58% 12%;
+
+    --card: 43 38% 95%;
+    --card-foreground: 164 58% 12%;
+
+    --popover: 43 38% 95%;
+    --popover-foreground: 164 58% 12%;
+
+    --primary: 14 87% 53%;
+    --primary-foreground: 43 38% 95%;
+
+    --secondary: 32 100% 66%;
+    --secondary-foreground: 164 58% 12%;
+
+    --muted: 43 38% 90%;
+    --muted-foreground: 164 58% 35%;
+
+    --accent: 32 100% 66%;
+    --accent-foreground: 164 58% 12%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 43 38% 95%;
+
+    --border: 164 58% 20%;
+    --input: 164 58% 20%;
+    --ring: 14 87% 53%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 164 58% 12%;
+    --foreground: 43 38% 95%;
+
+    --card: 164 58% 12%;
+    --card-foreground: 43 38% 95%;
+
+    --popover: 164 58% 12%;
+    --popover-foreground: 43 38% 95%;
+
+    --primary: 14 87% 53%;
+    --primary-foreground: 43 38% 95%;
+
+    --secondary: 32 100% 66%;
+    --secondary-foreground: 164 58% 12%;
+
+    --muted: 164 58% 18%;
+    --muted-foreground: 43 38% 80%;
+
+    --accent: 32 100% 66%;
+    --accent-foreground: 164 58% 12%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 43 38% 95%;
+
+    --border: 43 38% 80%;
+    --input: 43 38% 80%;
+    --ring: 14 87% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Space Grotesk", sans-serif;
+  }
+}
+
+.subscription-card {
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.subscription-card:hover {
+  transform: translateY(-5px) rotateX(5deg);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-flip {
+  position: relative;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card-flip.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Efectos para las tarjetas de suscripción */
+.card-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d-content {
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateZ(20px);
+}
+
+.card-3d:hover .card-3d-content {
+  transform: translateZ(40px);
+}
+
+.card-glassmorphism {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-gradient-mask {
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+
+.card-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-3d:hover .card-shine {
+  opacity: 1;
+}
+
+/* Animación de pulso mejorada */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(240, 83, 28, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(240, 83, 28, 0.4);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Animación de gradiente */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
+}
+
+/* Efectos de tema neon */
+.theme-neon .card {
+  border: 1px solid rgba(255, 107, 63, 0.3);
+  box-shadow: 0 0 15px rgba(255, 107, 63, 0.2);
+}
+
+.theme-neon .button {
+  border: 1px solid rgba(255, 107, 63, 0.5);
+  box-shadow: 0 0 10px rgba(255, 107, 63, 0.2);
+}
+
+.theme-neon .text-glow {
+  text-shadow: 0 0 8px rgba(255, 107, 63, 0.5);
+}
+
+/* Efectos de tema minimal */
+.theme-minimal .card {
+  border: none;
+  box-shadow: none;
+}
+
+.theme-minimal .divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Efectos de tema gradient */
+.theme-gradient .card {
+  background: linear-gradient(135deg, rgba(11, 74, 65, 0.8) 0%, rgba(7, 38, 33, 0.9) 100%);
+}
+
+.theme-gradient .button {
+  background: linear-gradient(135deg, rgba(255, 107, 63, 0.8) 0%, rgba(255, 181, 107, 0.8) 100%);
+  border: none;
+}
+
+/* Animación de confeti para logros */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #f0531c;
+  opacity: 0;
+  animation: confetti-fall 5s ease-in-out forwards;
+}
+
+/* Mejorar los estilos del tema brutalista para tener mejor armonía visual */
+
+/* Add brutalist theme styles */
+.theme-brutalist {
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --grid-size: 8px;
+}
+
+.theme-brutalist .card {
+  border: 2px solid #000;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
+  transition: all 0.2s ease;
+}
+
+.theme-brutalist .card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.theme-brutalist .button {
+  border: 2px solid #000;
+  border-radius: 0;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.2s ease;
+}
+
+.theme-brutalist .button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.theme-brutalist .button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.theme-brutalist .input {
+  border: 2px solid #000;
+  border-radius: 0;
+}
+
+.theme-brutalist .gradient-accent {
+  background: linear-gradient(90deg, #c84e32 0%, #e65d3f 100%);
+}
+
+.theme-brutalist .text-accent {
+  color: #c84e32;
+}
+
+.theme-brutalist .border-accent {
+  border-color: #c84e32;
+}
+
+.theme-brutalist .tabs {
+  border: 2px solid #000;
+  border-radius: 0;
+}
+
+.theme-brutalist .tab {
+  border-radius: 0;
+  border-right: 2px solid #000;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.theme-brutalist .tab:last-child {
+  border-right: none;
+}
+
+.theme-brutalist .tab[data-state="active"] {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Añadir una cuadrícula de fondo para el tema brutalista */
+.theme-brutalist-grid {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Añadir estilos para la barra de color del tema brutalista */
+.theme-brutalist-color-bar {
+  height: 8px;
+  background: linear-gradient(
+    to right,
+    #5e3023 0%,
+    #895737 16.6%,
+    #cf9c63 33.2%,
+    #e6d5b8 49.8%,
+    #999999 66.4%,
+    #444444 83%,
+    #000000 100%
+  );
+}
+
+/* Añadir estilos para las tarjetas de suscripción en el tema brutalista */
+.theme-brutalist .subscription-card {
+  border: 2px solid #000;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
+  transition: all 0.2s ease;
+  transform: none !important;
+}
+
+.theme-brutalist .subscription-card:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0 #000 !important;
+}
+
+/* Añadir estilos para las etiquetas en el tema brutalista */
+.theme-brutalist .badge {
+  border: 1px solid #000;
+  border-radius: 0;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+/* Añadir animaciones para el tema brutalista */
+@keyframes brutalist-pulse {
+  0%,
+  100% {
+    border-color: #000;
+  }
+  50% {
+    border-color: #c84e32;
+  }
+}
+
+.theme-brutalist .animate-brutalist-pulse {
+  animation: brutalist-pulse 2s infinite;
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
