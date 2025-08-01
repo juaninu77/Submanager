@@ -1,10 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import AppProviders from '@/components/providers/AppProviders'
-import { SkipLink } from '@/components/accessibility/AccessibilityMenu'
-import { GlobalLiveRegion } from '@/components/accessibility/LiveRegion'
-import { PWAPrompt, NetworkStatus, UpdatePrompt } from '@/components/pwa/PWAPrompt'
-import { UndoRedoProvider } from '@/components/features/UndoRedo'
 
 export const metadata: Metadata = {
   title: 'Submanager - Gestión de Suscripciones',
@@ -51,18 +46,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body>
-        <SkipLink />
-        <AppProviders>
-          <UndoRedoProvider>
-            <div id="main-content" tabIndex={-1}>
-              {children}
-            </div>
-            <PWAPrompt />
-            <NetworkStatus />
-            <UpdatePrompt />
-          </UndoRedoProvider>
-        </AppProviders>
-        <GlobalLiveRegion />
+        <div id="main-content">
+          {children}
+        </div>
       </body>
     </html>
   )
