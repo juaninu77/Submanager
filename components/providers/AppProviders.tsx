@@ -1,6 +1,4 @@
 import React, { Suspense } from 'react'
-import { AuthProvider } from '@/contexts/auth-context'
-import { AppProvider } from '@/contexts/AppContext'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import ErrorBoundary from '@/components/ErrorBoundary'
@@ -11,23 +9,22 @@ interface AppProvidersProps {
 }
 
 function AppProviders({ children }: AppProvidersProps) {
+  // Temporarily disable AuthProvider and AppProvider for demo mode
+  // This prevents API connection issues during development
+  
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <AppProvider>
-            <Suspense 
-              fallback={
-                <div className="flex items-center justify-center min-h-screen">
-                  <LoadingSpinner size="lg" />
-                </div>
-              }
-            >
-              {children}
-            </Suspense>
-            <Toaster />
-          </AppProvider>
-        </AuthProvider>
+        <Suspense 
+          fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <LoadingSpinner size="lg" />
+            </div>
+          }
+        >
+          {children}
+        </Suspense>
+        <Toaster />
       </ThemeProvider>
     </ErrorBoundary>
   )
