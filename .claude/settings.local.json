@@ -28,7 +28,10 @@
       "Bash(ls:*)",
       "Bash(npm run:*)",
       "Bash(tasklist:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo create:*)"
     ],
     "deny": []
   }
