@@ -1,38 +1,12 @@
 "use client"
 
-import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Shield, BarChart3, Bell } from "lucide-react"
 
 export default function Home() {
-  const { user, loading } = useAuth()
   const router = useRouter()
-
-  useEffect(() => {
-    if (!loading && user) {
-      router.push("/dashboard")
-    }
-  }, [user, loading, router])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-surface-paper via-primary-50/30 to-surface-elevated flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500 rounded-3xl mx-auto flex items-center justify-center animate-pulse shadow-xl">
-            <span className="text-white font-display font-bold text-2xl">S</span>
-          </div>
-          <p className="mt-4 text-neutral-600">Cargando...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (user) {
-    return null // Redirigiendo a dashboard
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-surface-paper via-primary-50/30 to-surface-elevated">
@@ -51,10 +25,10 @@ export default function Home() {
             Nunca más te olvides de un pago o pierdas dinero en servicios que no usas.
           </p>
           <Button
-            onClick={() => router.push("/auth")}
+            onClick={() => router.push("/demo")}
             className="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-medium px-8 py-3 rounded-xl text-lg"
           >
-            Comenzar gratis
+            Probar Demo
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
@@ -94,13 +68,13 @@ export default function Home() {
 
         {/* CTA */}
         <div className="text-center mt-16">
-          <p className="text-neutral-600 mb-4">¿Ya tienes cuenta?</p>
+          <p className="text-neutral-600 mb-4">¿Quieres probar todas las funciones?</p>
           <Button
-            onClick={() => router.push("/auth")}
+            onClick={() => router.push("/demo")}
             variant="outline"
             className="border-primary-300 text-primary-600 hover:bg-primary-50"
           >
-            Iniciar sesión
+            Ver Demo Completa
           </Button>
         </div>
       </div>
