@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id     String  @id @default(cuid())
+  email  String  @unique
+  name   String?
+  avatar String?
+  phone  String?
+
+  // Authentication
+  passwordHash  String?
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  // Preferences
+  language String @default("es")
+  timezone String @default("America/Mexico_City")
+  currency String @default("USD")
+
+  // Settings
+  settings String @default("{}")
+
+  // Timestamps
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  subscriptions Subscription[]
+  budgets       Budget[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String
+
+  // Basic info
+  name        String
+  description String?
+  amount      Decimal
+  currency    String  @default("USD")
+
+  // Billing
+  billingCycle String    @default("monthly") // monthly, yearly, quarterly
+  paymentDate  Int
+  nextPayment  DateTime?
+
+  // Categorization  
+  category String
+
+  // Visual
+  logo  String?
+  color String  @default("#000000")
+
+  // Status
+  isActive  Boolean   @default(true)
+  isTrial   Boolean   @default(false)
+  trialEnd  DateTime?
+  startDate DateTime?
+  endDate   DateTime?
+
+  // Metadata
+  metadata String @default("{}")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@index([paymentDate, userId])
+  @@index([category, userId])
+  @@index([nextPayment])
+  @@map("subscriptions")
+}
+
+model Budget {
+  id     String @id @default(cuid())
+  userId String
+
+  name        String
+  description String?
+  amount      Decimal
+  currency    String  @default("USD")
+  period      String  @default("monthly") // weekly, monthly, quarterly, yearly
+
+  // Categorization
+  category String? // null = all categories
+
+  // Behavior
+  rollover  Boolean @default(false)
+  isDefault Boolean @default(false)
+
+  // Alerts and notifications
+  alerts    String   @default("[]")
+  threshold Decimal? // Alert when % of budget is reached
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId, isDefault])
+  @@map("budgets")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model ApiKey {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  key       String    @unique
+  lastUsed  DateTime?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("api_keys")
+}

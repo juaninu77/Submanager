@@ -148,6 +148,7 @@ export default function Calendar({
                                     width={20}
                                     height={20}
                                     className="w-4 h-4 object-contain"
+                                    style={{ width: 'auto', height: 'auto', maxWidth: '16px', maxHeight: '16px' }}
                                   />
                                 ) : (
                                   <span className="text-[8px] text-white font-bold">{sub.name.charAt(0)}</span>

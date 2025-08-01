@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { X, Save, Trash2, CreditCard, Calendar, Palette } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -44,6 +44,18 @@ export default function EditSubscriptionForm({
   const [reminderDays, setReminderDays] = useState(
     subscription.reminderDays !== undefined ? subscription.reminderDays : 2,
   )
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCancel()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onCancel])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -97,7 +109,7 @@ export default function EditSubscriptionForm({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -134,7 +146,8 @@ export default function EditSubscriptionForm({
                     alt={name}
                     width={60}
                     height={60}
-                    className="object-contain"
+                    className="object-contain w-auto h-auto"
+                    style={{ width: 'auto', height: 'auto', maxWidth: '60px', maxHeight: '60px' }}
                   />
                 ) : (
                   <span className="text-3xl text-white font-bold">{name.charAt(0)}</span>

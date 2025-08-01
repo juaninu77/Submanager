@@ -48,13 +48,17 @@ export default function SavingsTips({ subscriptions, budget, onClose, darkMode =
   const optimizableSubs = findOptimizableSubs()
 
   return (
-    <Card className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div
-        className={`${darkMode ? "bg-charcoal-dark text-white" : "bg-white"} p-6 rounded-3xl w-full max-w-md font-mono shadow-soft animate-slide-up`}
+        className={`${
+          darkMode 
+            ? "bg-neutral-900/98 backdrop-blur-xl border border-neutral-700/50 text-white" 
+            : "bg-white/98 backdrop-blur-xl border border-neutral-200/50 text-neutral-900"
+        } p-6 rounded-3xl w-full max-w-md shadow-2xl`}
       >
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
-            <Lightbulb className="h-5 w-5 mr-2 text-terracotta-light" />
+            <Lightbulb className={`h-5 w-5 mr-2 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`} />
             <h2 className="text-xl font-bold">Consejos de Ahorro</h2>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0 rounded-full">
@@ -64,7 +68,7 @@ export default function SavingsTips({ subscriptions, budget, onClose, darkMode =
 
         <div className="space-y-4">
           {optimizableSubs.monthlyToYearly.length > 0 && (
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-charcoal-light" : "bg-sage-light/50"}`}>
+            <div className={`p-4 rounded-xl ${darkMode ? "bg-neutral-800/50" : "bg-neutral-50/50"}`}>
               <h3 className="font-bold flex items-center mb-2">
                 <TrendingDown className="h-4 w-4 mr-2 text-green-500" />
                 Cambia a planes anuales
@@ -84,9 +88,9 @@ export default function SavingsTips({ subscriptions, budget, onClose, darkMode =
           )}
 
           {optimizableSubs.lowUsage.length > 0 && (
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-charcoal-light" : "bg-sage-light/50"}`}>
+            <div className={`p-4 rounded-xl ${darkMode ? "bg-neutral-800/50" : "bg-neutral-50/50"}`}>
               <h3 className="font-bold flex items-center mb-2">
-                <DollarSign className="h-4 w-4 mr-2 text-terracotta-light" />
+                <DollarSign className={`h-4 w-4 mr-2 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`} />
                 Servicios de bajo uso
               </h3>
               <p className="text-sm mb-3">Considera pausar o cancelar estos servicios si no los usas con frecuencia:</p>
@@ -102,7 +106,7 @@ export default function SavingsTips({ subscriptions, budget, onClose, darkMode =
           )}
 
           {optimizableSubs.overlapping.length > 0 && (
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-charcoal-light" : "bg-sage-light/50"}`}>
+            <div className={`p-4 rounded-xl ${darkMode ? "bg-neutral-800/50" : "bg-neutral-50/50"}`}>
               <h3 className="font-bold flex items-center mb-2">
                 <DollarSign className="h-4 w-4 mr-2 text-blue-500" />
                 Servicios superpuestos
@@ -143,12 +147,16 @@ export default function SavingsTips({ subscriptions, budget, onClose, darkMode =
         </div>
 
         <Button
-          className="w-full mt-4 rounded-xl bg-terracotta-light hover:bg-terracotta-dark text-white"
+          className={`w-full mt-4 rounded-xl ${
+            darkMode 
+              ? 'bg-orange-500 hover:bg-orange-400 text-white' 
+              : 'bg-orange-600 hover:bg-orange-700 text-white'
+          }`}
           onClick={onClose}
         >
           Entendido
         </Button>
       </div>
-    </Card>
+    </div>
   )
 }

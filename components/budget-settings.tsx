@@ -33,7 +33,7 @@ export default function BudgetSettings({ currentBudget, onSave, onCancel, darkMo
   }
 
   return (
-    <Card className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <Card className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className={`${darkMode ? "bg-[#2d2d2d] text-white" : "bg-white"} p-6 rounded-lg w-full max-w-md font-mono`}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Ajustar Presupuesto</h2>

@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  phone     String?
+  
+  // Authentication
+  passwordHash String?
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+  
+  // Preferences
+  language String @default("es")
+  timezone String @default("America/Mexico_City")
+  currency String @default("USD")
+  
+  // Settings
+  settings Json @default("{}")
+  
+  // Timestamps
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  // Relations
+  subscriptions Subscription[]
+  budgets       Budget[]
+  
+  @@map("users")
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String
+  
+  // Basic info
+  name        String
+  description String?
+  amount      Decimal @db.Decimal(10, 2)
+  currency    String  @default("USD") @db.VarChar(3)
+  
+  // Billing
+  billingCycle String   @default("monthly") @db.VarChar(20) // monthly, yearly, quarterly
+  paymentDate  Int      @db.SmallInt
+  nextPayment  DateTime?
+  
+  // Categorization
+  category String @db.VarChar(50)
+  
+  // Visual
+  logo  String? @db.Text
+  color String  @default("#000000") @db.VarChar(7)
+  
+  // Status
+  isActive  Boolean @default(true)
+  isTrial   Boolean @default(false)
+  trialEnd  DateTime?
+  startDate DateTime?
+  endDate   DateTime?
+  
+  // Metadata
+  metadata Json @default("{}")
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("subscriptions")
+  @@index([userId, isActive])
+  @@index([paymentDate, userId])
+  @@index([category, userId])
+  @@index([nextPayment])
+}
+
+model Budget {
+  id     String @id @default(cuid())
+  userId String
+  
+  name        String
+  description String?
+  amount      Decimal @db.Decimal(10, 2)
+  currency    String  @default("USD") @db.VarChar(3)
+  period      String  @default("monthly") @db.VarChar(20) // weekly, monthly, quarterly, yearly
+  
+  // Categorization
+  category String? @db.VarChar(50) // null = all categories
+  
+  // Behavior
+  rollover  Boolean @default(false)
+  isDefault Boolean @default(false)
+  
+  // Alerts and notifications
+  alerts    Json @default("[]")
+  threshold Decimal? @db.Decimal(5, 2) // Alert when % of budget is reached
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("budgets")
+  @@unique([userId, name])
+  @@index([userId, isDefault])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  
+  @@map("sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  key       String   @unique
+  lastUsed  DateTime?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  
+  @@map("api_keys")
+  @@index([userId])
+}

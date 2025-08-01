@@ -74,11 +74,15 @@ const SubscriptionRingChart = ({ subscriptions, themeClasses }: SubscriptionRing
     }
   }
 
-  const describeArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number) => {
-    const start = polarToCartesian(x, y, radius, endAngle)
-    const end = polarToCartesian(x, y, radius, startAngle)
-    const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1"
-    // Increased gap from 2 to 4 for better visual separation
+  const describeArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number, gap: number = 8) => {
+    // Add gap to start and subtract from end to create proper spacing
+    const adjustedStartAngle = startAngle + gap / 2
+    const adjustedEndAngle = endAngle - gap / 2
+    
+    const start = polarToCartesian(x, y, radius, adjustedEndAngle)
+    const end = polarToCartesian(x, y, radius, adjustedStartAngle)
+    const largeArcFlag = adjustedEndAngle - adjustedStartAngle <= 180 ? "0" : "1"
+    
     const d = ["M", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(" ")
     return d
   }
@@ -117,7 +121,7 @@ const SubscriptionRingChart = ({ subscriptions, themeClasses }: SubscriptionRing
               {chartData.map((sub, index) => (
                 <motion.path
                   key={sub.id}
-                  d={describeArc(0, 0, radius, sub.startAngle, sub.endAngle - 4)} // -4 for gap
+                  d={describeArc(0, 0, radius, sub.startAngle, sub.endAngle)}
                   fill="none"
                   stroke={sub.color}
                   strokeWidth={strokeWidth}
@@ -136,14 +140,18 @@ const SubscriptionRingChart = ({ subscriptions, themeClasses }: SubscriptionRing
         <div className="absolute inset-0 pointer-events-none">
           {chartData.map((sub) => {
             if (sub.angle < 12) return null // Don't show logo if segment is too small
-            const midAngle = sub.startAngle + sub.angle / 2
+            // Calculate midpoint accounting for the gap
+            const gap = 8
+            const adjustedStartAngle = sub.startAngle + gap / 2
+            const adjustedEndAngle = sub.endAngle - gap / 2
+            const midAngle = adjustedStartAngle + (adjustedEndAngle - adjustedStartAngle) / 2
             const logoPlacementRadius = radius - strokeWidth / 2 // Position logo in the middle of the stroke
             const logoCenter = polarToCartesian(size / 2, size / 2, logoPlacementRadius, midAngle)
 
             return (
               <motion.div
                 key={`logo-${sub.id}`}
-                className="absolute w-10 h-10 flex items-center justify-center"
+                className="absolute w-12 h-12 flex items-center justify-center"
                 style={{
                   left: logoCenter.x,
                   top: logoCenter.y,
@@ -153,14 +161,14 @@ const SubscriptionRingChart = ({ subscriptions, themeClasses }: SubscriptionRing
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
               >
-                <div className="w-full h-full rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
                   <Image
                     src={sub.logo || "/placeholder.svg"}
                     alt={sub.name}
-                    width={24}
-                    height={24}
-                    className="object-contain"
-                    // Removed counter-rotation from here, image should always be upright
+                    width={20}
+                    height={20}
+                    className="object-contain rounded w-auto h-auto"
+                    style={{ width: 'auto', height: 'auto', maxWidth: '20px', maxHeight: '20px' }}
                   />
                 </div>
               </motion.div>

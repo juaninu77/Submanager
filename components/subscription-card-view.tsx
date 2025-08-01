@@ -26,14 +26,16 @@ import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { useMobile } from "@/hooks/use-mobile"
+import { EmptySubscriptions } from "@/components/ui/empty-state"
 
 interface SubscriptionCardViewProps {
   subscriptions: Subscription[]
   onEdit: (subscription: Subscription) => void
   onRemove: (id: string) => void
+  onAdd?: () => void
 }
 
-export default function SubscriptionCardView({ subscriptions, onEdit, onRemove }: SubscriptionCardViewProps) {
+export default function SubscriptionCardView({ subscriptions, onEdit, onRemove, onAdd }: SubscriptionCardViewProps) {
   const [flippedCard, setFlippedCard] = useState<string | null>(null)
   const [showcaseMode, setShowcaseMode] = useState(false)
   const [showcaseIndex, setShowcaseIndex] = useState(0)
@@ -359,7 +361,8 @@ export default function SubscriptionCardView({ subscriptions, onEdit, onRemove }
                       alt={sub.name}
                       width={40}
                       height={40}
-                      className="object-contain"
+                      className="object-contain w-auto h-auto"
+                      style={{ width: 'auto', height: 'auto', maxWidth: '40px', maxHeight: '40px' }}
                     />
                   ) : (
                     <span className="text-2xl font-bold text-white">{sub.name.charAt(0)}</span>
@@ -461,6 +464,11 @@ export default function SubscriptionCardView({ subscriptions, onEdit, onRemove }
     )
   }
 
+  // Show empty state when no subscriptions
+  if (subscriptions.length === 0) {
+    return <EmptySubscriptions onAddSubscription={onAdd || (() => {})} />
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-2">
@@ -484,7 +492,7 @@ export default function SubscriptionCardView({ subscriptions, onEdit, onRemove }
         </Button>
       </div>
 
-      <motion.div className="grid grid-cols-1 gap-6" variants={container} initial="hidden" animate="show">
+      <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6" variants={container} initial="hidden" animate="show">
         {subscriptions.map((sub) => {
           const isDarkColor = isColorDark(sub.color)
           const textColor = isDarkColor ? "text-white" : "text-fence-dark"
@@ -543,7 +551,8 @@ export default function SubscriptionCardView({ subscriptions, onEdit, onRemove }
                                 alt={sub.name}
                                 width={30}
                                 height={30}
-                                className="object-contain"
+                                className="object-contain w-auto h-auto"
+                                style={{ width: 'auto', height: 'auto', maxWidth: '30px', maxHeight: '30px' }}
                               />
                             ) : (
                               <span className="text-xl font-bold text-white">{sub.name.charAt(0)}</span>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Moon, Sun, CalendarIcon, Settings, PaletteIcon, Trophy, User } from "lucide-react"
+import { Moon, Sun, CalendarIcon, Settings, PaletteIcon, Trophy, User, TrendingUp } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -27,9 +27,17 @@ import SubscriptionCardView from "@/components/subscription-card-view"
 import GamificationModal from "@/components/gamification-modal"
 import DashboardView from "@/components/dashboard-view"
 import { storage } from "@/lib/storage" // Importar la utilidad de almacenamiento
+import { useMounted } from "@/hooks/use-mounted"
+import ImprovedLayout from "@/components/improved-layout"
+import UnifiedNavigation from "@/components/navigation/unified-navigation"
+import SmartActionMenu from "@/components/ui/smart-action-menu"
+import AppHeader from "@/components/layout/app-header"
+import { componentStyles } from "@/lib/design-tokens"
+import { AnimatePresence } from "framer-motion"
 
 export default function SubscriptionManager() {
-  const [darkMode, setDarkMode] = useState(true)
+  const mounted = useMounted()
+  const [darkMode, setDarkMode] = useState(false)
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
   const [filteredSubscriptions, setFilteredSubscriptions] = useState<Subscription[]>([])
   const [showSummary, setShowSummary] = useState(false)
@@ -129,6 +137,7 @@ export default function SubscriptionManager() {
     }
 
     setAppTheme(storage.getItem("appTheme", "default"))
+    setDarkMode(storage.getItem("darkMode", true))
 
     const firstVisit = storage.getItem("firstVisit", true)
     if (firstVisit) {
@@ -136,6 +145,14 @@ export default function SubscriptionManager() {
       storage.setItem("firstVisit", false)
     }
   }, [])
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }, [darkMode])
 
   useEffect(() => {
     let result = [...subscriptions]
@@ -208,11 +225,6 @@ export default function SubscriptionManager() {
     const newDarkMode = !darkMode
     setDarkMode(newDarkMode)
     storage.setItem("darkMode", newDarkMode)
-    if (newDarkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
   }
 
   const cycleAppTheme = () => {
@@ -269,57 +281,64 @@ export default function SubscriptionManager() {
   }
 
   const getThemeClasses = () => {
+    const mode = darkMode ? 'dark' : 'light'
+    
     switch (appTheme) {
-      case "neon":
+      case "revival":
         return {
-          cardBg: "bg-fence-dark/90 backdrop-blur-md border border-fiery-light/30 shadow-glow",
-          buttonStyle: "border-fiery-light/50 text-fiery-light hover:bg-fiery-light hover:text-fence-dark",
-          tabsBg: "bg-fence-light/50 backdrop-blur-md",
-          font: "font-mono tracking-wide",
-          cardRadius: "rounded-3xl",
-          buttonRadius: "rounded-2xl",
-          accent: "text-fiery-light",
-        }
-      case "minimal":
-        return {
-          cardBg: "bg-fence-dark border-0 shadow-none",
-          buttonStyle: "border-venetian-light/20 text-venetian-light/80 hover:bg-venetian-light/10",
-          tabsBg: "bg-fence-light/30",
-          font: "font-sans tracking-normal",
-          cardRadius: "rounded-xl",
-          buttonRadius: "rounded-xl",
-          accent: "text-venetian-light",
-        }
-      case "gradient":
-        return {
-          cardBg: "bg-gradient-to-br from-fence-dark via-fence-light/10 to-fence-dark/80 backdrop-blur-md border-0",
-          buttonStyle: "border-0 bg-gradient-to-r from-fiery-light to-pumpkin-light text-white hover:opacity-90",
-          tabsBg: "bg-gradient-to-r from-fence-light/40 to-fence-light/20",
+          cardBg: darkMode 
+            ? "bg-neutral-900/95 backdrop-blur-md border border-orange-500/30 shadow-glow" 
+            : "bg-white/95 backdrop-blur-md border border-red-800/30 shadow-lg",
+          buttonStyle: darkMode
+            ? "border-yellow-400/50 text-yellow-400 hover:bg-yellow-400 hover:text-red-900 font-semibold"
+            : "border-red-800/50 text-red-800 hover:bg-red-800 hover:text-white font-semibold",
+          tabsBg: darkMode ? "bg-neutral-800/50 backdrop-blur-md" : "bg-neutral-100/50 backdrop-blur-md",
           font: "font-sans tracking-wide",
           cardRadius: "rounded-2xl",
           buttonRadius: "rounded-xl",
-          accent: "text-pumpkin-light",
+          accent: darkMode ? "text-yellow-400" : "text-red-800",
         }
-      case "brutalist":
+      case "venetian":
         return {
-          cardBg: "bg-white border-2 border-black",
-          buttonStyle:
-            "border-2 border-black text-black hover:bg-black hover:text-white font-bold uppercase tracking-wider",
-          tabsBg: "bg-white border-2 border-black",
-          font: "font-mono uppercase tracking-wider",
-          cardRadius: "rounded-none",
-          buttonRadius: "rounded-none",
-          accent: "text-red-600",
+          cardBg: darkMode 
+            ? "bg-teal-900/95 backdrop-blur-md border border-amber-200/30 shadow-glow"
+            : "bg-amber-50/95 backdrop-blur-md border border-orange-600/30 shadow-lg",
+          buttonStyle: darkMode
+            ? "border-amber-200/50 text-amber-200 hover:bg-amber-200 hover:text-teal-900 font-medium"
+            : "border-orange-600/50 text-orange-600 hover:bg-orange-600 hover:text-white font-medium",
+          tabsBg: darkMode ? "bg-teal-800/50 backdrop-blur-md" : "bg-amber-100/50 backdrop-blur-md",
+          font: "font-serif tracking-normal",
+          cardRadius: "rounded-3xl",
+          buttonRadius: "rounded-2xl",
+          accent: darkMode ? "text-amber-200" : "text-orange-600",
+        }
+      case "gaming":
+        return {
+          cardBg: darkMode 
+            ? "bg-neutral-900/98 backdrop-blur-md border border-green-400/30 shadow-[0_0_20px_rgba(0,255,136,0.15)]"
+            : "bg-white/98 backdrop-blur-md border border-green-500/30 shadow-lg",
+          buttonStyle: darkMode
+            ? "border-green-400/50 text-green-400 hover:bg-green-400 hover:text-black font-bold tracking-wide"
+            : "border-green-500/50 text-green-500 hover:bg-green-500 hover:text-white font-bold tracking-wide",
+          tabsBg: darkMode ? "bg-neutral-800/50 backdrop-blur-md" : "bg-neutral-50/50 backdrop-blur-md",
+          font: "font-mono tracking-wider uppercase",
+          cardRadius: "rounded-xl",
+          buttonRadius: "rounded-lg",
+          accent: darkMode ? "text-green-400" : "text-green-500",
         }
       default:
         return {
-          cardBg: "bg-fence-dark",
-          buttonStyle: "border-venetian-light/30 text-venetian-light hover:bg-venetian-light hover:text-fence-dark",
-          tabsBg: "bg-fence-light",
-          font: "font-mono",
+          cardBg: darkMode 
+            ? "bg-neutral-900/95 backdrop-blur-md border border-primary-400/30 shadow-glow"
+            : "bg-white/95 backdrop-blur-md border border-primary-200/50 shadow-lg",
+          buttonStyle: darkMode
+            ? "border-primary-400/50 text-primary-400 hover:bg-primary-400 hover:text-neutral-900 font-medium"
+            : "border-primary-600/50 text-primary-600 hover:bg-primary-600 hover:text-white font-medium",
+          tabsBg: darkMode ? "bg-neutral-800/50 backdrop-blur-md" : "bg-primary-50/50 backdrop-blur-md",
+          font: "font-sans tracking-normal",
           cardRadius: "rounded-2xl",
           buttonRadius: "rounded-xl",
-          accent: "text-fiery-light",
+          accent: darkMode ? "text-primary-400" : "text-primary-600",
         }
     }
   }
@@ -338,11 +357,43 @@ export default function SubscriptionManager() {
     })
   }
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-surface-paper via-primary-50/30 to-surface-elevated dark:from-neutral-950 dark:via-primary-950/30 dark:to-neutral-900 flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500 rounded-3xl mx-auto flex items-center justify-center animate-pulse shadow-xl">
+            <span className="text-white font-display font-bold text-3xl">S</span>
+          </div>
+          <div className="space-y-3">
+            <h2 className={`${componentStyles.text.headline} text-2xl`}>
+              Cargando Submanager
+            </h2>
+            <p className={componentStyles.text.description}>
+              Preparando tu experiencia financiera orgánica
+            </p>
+            <div className="flex justify-center">
+              <div className="flex space-x-2">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="w-3 h-3 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full animate-pulse"
+                    style={{
+                      animationDelay: `${i * 0.3}s`,
+                      animationDuration: "1.2s"
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={`w-full max-w-md mx-auto ${darkMode ? "dark" : ""} ${appTheme === "brutalist" ? "theme-brutalist" : ""}`}
-    >
-      {showOnboarding && <OnboardingTour onComplete={() => setShowOnboarding(false)} />}
+    <div className={`${darkMode ? "dark" : ""} ${appTheme === "brutalist" ? "theme-brutalist" : ""}`}>
+      {showOnboarding && <OnboardingTour onComplete={() => setShowOnboarding(false)} darkMode={darkMode} />}
       {showNotification && (
         <NotificationBanner subscriptions={upcomingPayments} onDismiss={() => setShowNotification(false)} />
       )}
@@ -363,112 +414,148 @@ export default function SubscriptionManager() {
         />
       )}
 
-      <Card
-        className={`overflow-hidden ${themeClasses.cardRadius} transition-all duration-300 animate-fade-in ${themeClasses.cardBg}`}
-      >
-        <div
-          className={`${darkMode ? "text-venetian-light" : "text-fence-dark"} p-6 ${themeClasses.font} transition-colors duration-300 relative`}
-        >
-          <div className="flex justify-between items-center mb-6">
-            <h1 className={`text-2xl uppercase tracking-wide font-bold ${themeClasses.font}`}>Suscripciones</h1>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className={`${themeClasses.buttonRadius} h-9 w-9`}>
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowGamification(true)}>
-                  <Trophy className="mr-2 h-4 w-4" />
-                  <span>Gamificación</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowSettings(true)}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Presupuesto</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={cycleAppTheme}>
-                  <PaletteIcon className="mr-2 h-4 w-4" />
-                  <span>Cambiar Tema</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={toggleDarkMode}>
-                  {darkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  <span>{darkMode ? "Modo Claro" : "Modo Oscuro"}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
+        {/* Unified Navigation */}
+        <UnifiedNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onAddSubscription={() => setShowAddForm(true)}
+          onToggleDarkMode={toggleDarkMode}
+          onCycleTheme={cycleAppTheme}
+          onShowGamification={() => setShowGamification(true)}
+          onShowSettings={() => setShowSettings(true)}
+          darkMode={darkMode}
+          currentTheme={appTheme}
+          onThemeChange={(theme) => setAppTheme(theme as any)}
+        />
 
-          <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className={`grid w-full grid-cols-3 p-1 ${themeClasses.cardRadius} ${themeClasses.tabsBg}`}>
-              <TabsTrigger value="dashboard" className={`${themeClasses.buttonRadius} data-[state=active]:shadow-glow`}>
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="calendar" className={`${themeClasses.buttonRadius} data-[state=active]:shadow-glow`}>
-                Calendario
-              </TabsTrigger>
-              <TabsTrigger value="cards" className={`${themeClasses.buttonRadius} data-[state=active]:shadow-glow`}>
-                Tarjetas
-              </TabsTrigger>
-            </TabsList>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Enhanced App Header */}
+          <AppHeader
+            activeTab={activeTab}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            darkMode={darkMode}
+            onToggleDarkMode={toggleDarkMode}
+            currentTheme={appTheme}
+            onThemeChange={(theme) => setAppTheme(theme as any)}
+            onShowGamification={() => setShowGamification(true)}
+            onShowSettings={() => setShowSettings(true)}
+          />
 
-            <TabsContent value="dashboard" className="mt-6">
-              <DashboardView
-                totalMonthly={totalMonthly}
-                totalYearly={totalYearly}
-                budget={budget}
-                subscriptions={subscriptions}
-                filteredSubscriptions={filteredSubscriptions}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                activeFilter={activeFilter}
-                setActiveFilter={setActiveFilter}
-                showFilters={showFilters}
-                setShowFilters={setShowFilters}
-                setShowAddForm={setShowAddForm}
-                setShowSummary={setShowSummary}
-                themeClasses={themeClasses}
-                darkMode={darkMode}
-              />
-            </TabsContent>
+          {/* Scrollable Content */}
+          <main className="flex-1 overflow-y-auto">
+            <div className="min-h-full p-4 sm:p-6 lg:p-8 pb-20 sm:pb-24">
+              <div className="max-w-full mx-auto">
 
-            <TabsContent value="calendar" className="mt-6">
-              <div className="mb-3 text-sm uppercase tracking-wider flex items-center">
-                <CalendarIcon className="h-4 w-4 mr-2 text-fiery-light" />
+
+        {/* Content Area */}
+        <div className="space-y-4 lg:space-y-6">
+          {activeTab === 'dashboard' && (
+            <DashboardView
+              totalMonthly={totalMonthly}
+              totalYearly={totalYearly}
+              budget={budget}
+              subscriptions={subscriptions}
+              filteredSubscriptions={filteredSubscriptions}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              activeFilter={activeFilter}
+              setActiveFilter={setActiveFilter}
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+              setShowAddForm={setShowAddForm}
+              setShowSummary={setShowSummary}
+              themeClasses={themeClasses}
+              darkMode={darkMode}
+            />
+          )}
+
+          {activeTab === 'calendar' && (
+            <div className="space-y-4 lg:space-y-6">
+              <div className="flex items-center text-sm uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                <CalendarIcon className="h-4 w-4 mr-2" />
                 {monthNames[currentMonth]} {currentYear}
               </div>
-              <Calendar
-                month={currentMonth}
-                year={currentYear}
-                subscriptions={filteredSubscriptions}
-                onPrevMonth={prevMonth}
-                onNextMonth={nextMonth}
-                darkMode={darkMode}
-              />
-            </TabsContent>
+              <div className="lg:max-w-none">
+                <Calendar
+                  month={currentMonth}
+                  year={currentYear}
+                  subscriptions={filteredSubscriptions}
+                  onPrevMonth={prevMonth}
+                  onNextMonth={nextMonth}
+                  darkMode={darkMode}
+                />
+              </div>
+            </div>
+          )}
 
-            <TabsContent value="cards" className="mt-6">
-              <SubscriptionCardView
-                subscriptions={filteredSubscriptions}
-                onEdit={handleEditSubscription}
-                onRemove={removeSubscription}
-              />
-            </TabsContent>
-          </Tabs>
+          {activeTab === 'cards' && (
+            <SubscriptionCardView
+              subscriptions={filteredSubscriptions}
+              onEdit={handleEditSubscription}
+              onRemove={removeSubscription}
+              onAdd={() => setShowAddForm(true)}
+            />
+          )}
+
+          {/* Placeholder for other tabs */}
+          {activeTab === 'analytics' && (
+            <div className="text-center py-12">
+              <TrendingUp className="mx-auto h-12 w-12 text-neutral-400" />
+              <h3 className="mt-4 text-lg font-medium">Análisis en desarrollo</h3>
+              <p className="mt-2 text-neutral-500">Esta sección estará disponible pronto</p>
+            </div>
+          )}
+
+          {activeTab === 'achievements' && (
+            <div className="text-center py-12">
+              <Trophy className="mx-auto h-12 w-12 text-neutral-400" />
+              <h3 className="mt-4 text-lg font-medium">Logros en desarrollo</h3>
+              <p className="mt-2 text-neutral-500">Sistema de logros expandido próximamente</p>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="text-center py-12">
+              <Settings className="mx-auto h-12 w-12 text-neutral-400" />
+              <h3 className="mt-4 text-lg font-medium">Configuración en desarrollo</h3>
+              <p className="mt-2 text-neutral-500">Panel de configuración avanzado próximamente</p>
+            </div>
+          )}
         </div>
-      </Card>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
 
-      {showSummary && (
-        <SubscriptionSummary
-          subscriptions={filteredSubscriptions}
-          total={totalMonthly}
-          onClose={() => setShowSummary(false)}
-          onRemove={removeSubscription}
-          onEdit={handleEditSubscription}
-          darkMode={darkMode}
-        />
-      )}
+      {/* Smart Action Menu - Context-aware actions */}
+      <SmartActionMenu
+        activeTab={activeTab}
+        onAddSubscription={() => setShowAddForm(true)}
+        onQuickAdd={() => setShowAddForm(true)}
+        onImport={() => {
+          // TODO: Implement import functionality
+        }}
+        onExport={() => {
+          // TODO: Implement export functionality
+        }}
+      />
+
+      <AnimatePresence>
+        {showSummary && (
+          <SubscriptionSummary
+            subscriptions={filteredSubscriptions}
+            total={totalMonthly}
+            onClose={() => setShowSummary(false)}
+            onRemove={removeSubscription}
+            onEdit={handleEditSubscription}
+            darkMode={darkMode}
+          />
+        )}
+      </AnimatePresence>
 
       {showAddForm && (
         <AddSubscriptionForm onAdd={addSubscription} onCancel={() => setShowAddForm(false)} darkMode={darkMode} />

@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { X, Search, Loader2 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Subscription, SubscriptionCategory } from "@/types/subscription"
+import { LogoService } from "@/lib/logo-service"
+import Image from "next/image"
 
 interface AddSubscriptionFormProps {
   onAdd: (subscription: Subscription) => void
@@ -26,6 +28,44 @@ export default function AddSubscriptionForm({ onAdd, onCancel, darkMode = false 
   const [category, setCategory] = useState<SubscriptionCategory>("other")
   const [description, setDescription] = useState("")
   const [billingCycle, setBillingCycle] = useState("monthly")
+  const [logoUrl, setLogoUrl] = useState("")
+  const [isSearchingLogo, setIsSearchingLogo] = useState(false)
+  const [logoSearched, setLogoSearched] = useState(false)
+
+  // Auto-search logo when name changes
+  useEffect(() => {
+    const searchLogo = async () => {
+      if (name.trim().length > 2 && !logoSearched) {
+        setIsSearchingLogo(true)
+        try {
+          const result = await LogoService.searchLogo(name)
+          if (result) {
+            setLogoUrl(result.url)
+          }
+        } catch (error) {
+          console.error('Logo search failed:', error)
+        } finally {
+          setIsSearchingLogo(false)
+          setLogoSearched(true)
+        }
+      }
+    }
+
+    const timeoutId = setTimeout(searchLogo, 500) // Debounce
+    return () => clearTimeout(timeoutId)
+  }, [name, logoSearched])
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCancel()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onCancel])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,7 +80,7 @@ export default function AddSubscriptionForm({ onAdd, onCancel, darkMode = false 
       name,
       amount: Number.parseFloat(amount),
       paymentDate: Number.parseInt(paymentDate),
-      logo: `/placeholder.svg?height=16&width=16`,
+      logo: logoUrl || `/placeholder.svg?height=16&width=16`,
       color,
       category,
       description,
@@ -51,8 +91,32 @@ export default function AddSubscriptionForm({ onAdd, onCancel, darkMode = false 
     onAdd(newSubscription)
   }
 
+  const handleManualLogoSearch = async () => {
+    if (!name.trim()) return
+    
+    setIsSearchingLogo(true)
+    try {
+      const result = await LogoService.searchLogo(name)
+      if (result) {
+        setLogoUrl(result.url)
+      }
+    } catch (error) {
+      console.error('Manual logo search failed:', error)
+    } finally {
+      setIsSearchingLogo(false)
+    }
+  }
+
+  const handleNameChange = (newName: string) => {
+    setName(newName)
+    setLogoSearched(false) // Allow new search when name changes significantly
+    if (newName.trim().length < 3) {
+      setLogoUrl("")
+    }
+  }
+
   return (
-    <Card className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <Card className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className={`${darkMode ? "bg-[#2d2d2d] text-white" : "bg-white"} p-6 rounded-lg w-full max-w-md font-mono`}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Añadir Suscripción</h2>
@@ -65,14 +129,47 @@ export default function AddSubscriptionForm({ onAdd, onCancel, darkMode = false 
           <div className="space-y-4">
             <div>
               <Label htmlFor="name">Nombre</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Netflix, Spotify, etc."
-                required
-                className={darkMode ? "bg-[#444] border-[#555]" : ""}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  placeholder="Netflix, Spotify, etc."
+                  required
+                  className={darkMode ? "bg-[#444] border-[#555]" : ""}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleManualLogoSearch}
+                  disabled={!name.trim() || isSearchingLogo}
+                  className={darkMode ? "bg-[#444] border-[#555] hover:bg-[#555]" : ""}
+                >
+                  {isSearchingLogo ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Search className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              {/* Logo preview */}
+              {logoUrl && (
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded border flex items-center justify-center bg-white">
+                    <Image
+                      src={logoUrl}
+                      alt={`${name} logo`}
+                      width={24}
+                      height={24}
+                      className="object-contain w-auto h-auto"
+                      style={{ width: 'auto', height: 'auto', maxWidth: '24px', maxHeight: '24px' }}
+                      onError={() => setLogoUrl("")}
+                    />
+                  </div>
+                  <span className="text-sm text-gray-500">Logo encontrado</span>
+                </div>
+              )}
             </div>
 
             <div>
